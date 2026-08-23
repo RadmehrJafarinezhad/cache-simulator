@@ -14,7 +14,7 @@ class LFUCache:
 
         elif self.is_full():
 
-            temp = [(key, value["frequency"], value["last_used"]) for key,value in self.__cache.items()]
+            temp = [(key, value["frequency"], value["last_used"]) for key, value in self.__cache.items()]
             temp.sort(key=lambda x: (x[1], x[2]))
 
             del self.__cache[temp[0][0]]
@@ -27,6 +27,17 @@ class LFUCache:
 
         self.last_used += 1
 
+    def get(self, key):
+        if key not in self.__cache:
+            return -1
+
+        self.__cache[key]["frequency"] += 1
+        self.__cache[key]["last_used"] = self.last_used
+        self.last_used += 1
+
+        return self.__cache[key]["value"]
+
+
     def is_full(self):
         return len(self.__cache) == self.capacity
 
@@ -35,4 +46,11 @@ cache = LFUCache(2)
 
 cache.put(1, 1)
 cache.put(2, 2)
+
+cache.get(1)
+
 cache.put(3, 3)
+
+print(cache.get(1))
+print(cache.get(2))
+print(cache.get(3))
