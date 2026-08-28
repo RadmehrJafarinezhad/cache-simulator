@@ -29,6 +29,9 @@ class LFUCache:
 
         node = Node(key, value)
         self.__cache[key] = node
+        if 1 not in self.__linked_dict:
+            self.__linked_dict[1] = []
+
         self.__linked_dict[1].append(node)
 
     def get(self, key):
@@ -51,6 +54,8 @@ class LFUCache:
             self.__linked_dict[node.freq].append(node)
             return None
         else:
+            if node.freq not in self.__linked_dict:
+                self.__linked_dict[node.freq] = []
             self.__linked_dict[node.freq].append(node)
             return self.__linked_dict[node.freq]
 
