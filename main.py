@@ -3,6 +3,54 @@ class Node:
         self.key = key
         self.value = value
         self.freq = 1
+        self.prev = None
+        self.next = None
+
+class LinkedList:
+    def __init__(self,initial_node):
+        self.head = initial_node
+        self.tail = initial_node
+
+    def insert_to_start(self,new_node):
+        new_node.next = self.head
+        self.head.prev = new_node
+        self.head = new_node
+
+    def insert_to_end(self,new_node):
+        new_node.prev = self.tail
+        self.tail.next = new_node
+        self.tail = new_node
+
+    def remove_first_node(self):
+        old_node = self.head
+
+        if self.head.next is None:
+            self.head = self.tail = None
+            return old_node, False
+
+        else:
+            self.head = self.head.next
+            self.head.prev = None
+            return old_node, True
+
+    def remove_last_node(self):
+        old_node = self.tail
+        if self.tail.prev is None:
+            self.tail = self.head = None
+            return old_node, False
+        else:
+            self.tail = self.tail.prev
+            self.tail.next = None
+            return old_node, True
+
+    def remove(self,node):
+        if node is self.head:
+            self.remove_first_node()
+        elif node is self.tail:
+            self.remove_last_node()
+        else:
+            node.prev.next = node.next
+            node.next.prev = node.prev
 
 class LFUCache:
 
@@ -13,66 +61,11 @@ class LFUCache:
         self.__linked_dict = {}
 
     def put(self, key, value):
-        if key in self.__cache:
-            self.__linked_dict_config("put", key, value)
-            return
+        pass
 
-        if self.is_full():
-            unused_nodes = self.__linked_dict[self.min_frequency]
-
-            unused_key = unused_nodes[0].key
-            del self.__cache[unused_key]
-            unused_nodes.pop(0)
-            if not self.__linked_dict[self.min_frequency]:
-                del self.__linked_dict[self.min_frequency]
-                self.min_frequency += 1
-
-        node = Node(key, value)
-        self.__cache[key] = node
-        if 1 not in self.__linked_dict:
-            self.__linked_dict[1] = []
-
-        self.__linked_dict[1].append(node)
-
-    def get(self, key):
-        if key not in self.__cache:
-            return -1
-
-        self.__linked_dict_config("get", key)
-        return self.__cache[key].value
-
-    def __linked_dict_config(self, config,key,value = None):
-        node = self.__cache[key]
-        self.__linked_dict[node.freq].remove(node)
-
-        if not self.__linked_dict[node.freq]:
-            del self.__linked_dict[node.freq]
-
-        node.freq += 1
-        if config == "put":
-            node.value = value
-            self.__linked_dict[node.freq].append(node)
-            return None
-        else:
-            if node.freq not in self.__linked_dict:
-                self.__linked_dict[node.freq] = []
-            self.__linked_dict[node.freq].append(node)
-            return self.__linked_dict[node.freq]
-
+    def get(self,key):
+        pass
 
     def is_full(self):
         return len(self.__cache) == self.capacity
 
-
-cache = LFUCache(2)
-
-cache.put(1, 1)
-cache.put(2, 2)
-
-cache.get(1)
-
-cache.put(3, 3)
-
-print(cache.get(1))
-print(cache.get(2))
-print(cache.get(3))
